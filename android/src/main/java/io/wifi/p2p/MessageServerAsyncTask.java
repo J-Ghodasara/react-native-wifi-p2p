@@ -1,8 +1,6 @@
 package io.wifi.p2p;
 
 import android.os.AsyncTask;
-import android.util.Log;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -10,6 +8,8 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 import com.facebook.react.bridge.Callback;
+import com.facebook.react.bridge.ReactMethod;
+import com.facebook.react.modules.core.DeviceEventManagerModule;
 
 import static io.wifi.p2p.Utils.CHARSET;
 
@@ -19,7 +19,6 @@ import static io.wifi.p2p.Utils.CHARSET;
  * the stream.
  */
 public class MessageServerAsyncTask extends AsyncTask<Void, Void, String> {
-    private static final String TAG = "RNWiFiP2P";
     private Callback callback;
 
     /**
@@ -47,18 +46,17 @@ public class MessageServerAsyncTask extends AsyncTask<Void, Void, String> {
     protected String doInBackground(Void... params) {
         try {
             ServerSocket serverSocket = new ServerSocket(8988);
-            Log.i(TAG, "Server: Socket opened");
+            System.out.println("Server: Socket opened");
             Socket client = serverSocket.accept();
-            Log.i(TAG, "Server: connection done");
-
+            String clientAddress = client.getInetAddress().toString();
+            System.out.println("Server: connection done "+ clientAddress);
             InputStream inputstream = client.getInputStream();
-            String result = convertStreamToString(inputstream);
+            String result = convertStreamToString(inputstream) + "," + clientAddress;
             serverSocket.close();
             callback.invoke(result);
-
             return result;
         } catch (IOException e) {
-            Log.e(TAG, e.getMessage());
+            System.err.println(e.getMessage());
             return null;
         }
     }
@@ -69,6 +67,6 @@ public class MessageServerAsyncTask extends AsyncTask<Void, Void, String> {
      */
     @Override
     protected void onPreExecute() {
-        Log.i(TAG, "Opening a server socket");
+        System.out.println("Opening a server socket");
     }
 }

@@ -50,6 +50,7 @@ public class WiFiP2PDeviceMapper {
         WritableMap params = Arguments.createMap();
 
         if (wifiP2pInformation.groupOwnerAddress != null) {
+            System.out.println("GROUP OWNER " +wifiP2pInformation.groupOwnerAddress );
             WritableMap groupOwnerAddress = Arguments.createMap();
             groupOwnerAddress.putString("hostAddress", wifiP2pInformation.groupOwnerAddress.getHostAddress());
             //groupOwnerAddress.putString("canonicalHostName", info.groupOwnerAddress.getCanonicalHostName());

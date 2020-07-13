@@ -3,7 +3,6 @@ package io.wifi.p2p;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Environment;
-import android.util.Log;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -17,44 +16,45 @@ import com.facebook.react.bridge.Callback;
 import static io.wifi.p2p.Utils.copyBytes;
 
 /**
- * Created by Kiryl on 18.7.18.
+ * Created by kiryl on 18.7.18.
  * A simple server socket that accepts connection and writes some data on
  * the stream.
  */
 public class FileServerAsyncTask extends AsyncTask<Void, Void, String> {
-    private static final String TAG = "RNWiFiP2P";
+    private Context context;
     private Callback callback;
-    private String destination;
+    private String nameOfFile;
 
     /**
      * @param context
-     * @param callback
-     * @param destination
      */
-    public FileServerAsyncTask(Context context, Callback callback, String destination) {
+    public FileServerAsyncTask(Context context, Callback callback,String nameOfFile) {
+        this.context = context;
         this.callback = callback;
-        this.destination = destination;
+        this.nameOfFile = nameOfFile;
     }
 
     @Override
     protected String doInBackground(Void... params) {
         try {
             ServerSocket serverSocket = new ServerSocket(8988);
-            Log.i(TAG, "Server: Socket opened");
+            System.out.println("Server: Socket opened");
             Socket client = serverSocket.accept();
-            Log.i(TAG, "Server: connection done");
-            final File f = new File(destination);
+
+            final File f = new File(Environment.getExternalStorageDirectory() + "/"
+                    + "ShareSafe" +"/" + nameOfFile);
             File dirs = new File(f.getParent());
             if (!dirs.exists())
                 dirs.mkdirs();
             f.createNewFile();
-            Log.i(TAG, "Server: copying files " + f.toString());
+            System.out.println("server: copying files " + f.toString());
             InputStream inputstream = client.getInputStream();
             copyBytes(inputstream, new FileOutputStream(f));
+            System.out.println("FILE RECEIVED");
             serverSocket.close();
             return f.getAbsolutePath();
         } catch (IOException e) {
-            Log.e(TAG, e.getMessage());
+            System.err.println(e.getMessage());
             return null;
         }
     }
@@ -65,7 +65,7 @@ public class FileServerAsyncTask extends AsyncTask<Void, Void, String> {
     @Override
     protected void onPostExecute(String result) {
         if (result != null) {
-            Log.i(TAG, "File copied - " + result);
+            System.out.println("File copied - " + result);
             callback.invoke(result);
         }
     }
@@ -75,6 +75,6 @@ public class FileServerAsyncTask extends AsyncTask<Void, Void, String> {
      */
     @Override
     protected void onPreExecute() {
-        Log.i(TAG, "Opening a server socket");
+        System.out.println("Opening a server socket");
     }
 }

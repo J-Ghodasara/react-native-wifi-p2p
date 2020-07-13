@@ -12,8 +12,8 @@ import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.net.wifi.p2p.WifiP2pGroup;
 import android.net.wifi.p2p.WifiP2pManager.PeerListListener;
-import android.util.Log;
 
+import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
@@ -34,7 +34,6 @@ public class WiFiP2PManagerModule extends ReactContextBaseJavaModule implements 
     private WifiP2pManager.Channel channel;
     private ReactApplicationContext reactContext;
     private final IntentFilter intentFilter = new IntentFilter();
-    private static final String TAG = "RNWiFiP2P";
     private WiFiP2PDeviceMapper mapper = new WiFiP2PDeviceMapper();
 
     public WiFiP2PManagerModule(ReactApplicationContext reactContext) {
@@ -57,7 +56,7 @@ public class WiFiP2PManagerModule extends ReactContextBaseJavaModule implements 
         manager.requestConnectionInfo(channel, new WifiP2pManager.ConnectionInfoListener() {
             @Override
             public void onConnectionInfoAvailable(WifiP2pInfo wifiP2pInformation) {
-                Log.i(TAG, wifiP2pInformation.toString());
+                System.out.println(wifiP2pInformation);
 
                 wifiP2pInfo = wifiP2pInformation;
 
@@ -113,11 +112,13 @@ public class WiFiP2PManagerModule extends ReactContextBaseJavaModule implements 
     public void createGroup(final Callback callback) {
         manager.createGroup(channel,  new WifiP2pManager.ActionListener()  {
             public void onSuccess() {
-                callback.invoke(); // Group creation successful
+                callback.invoke();
+                //Group creation successful
             }
 
             public void onFailure(int reason) {
-                callback.invoke(Integer.valueOf(reason)); // Group creation failed
+                callback.invoke(Integer.valueOf(reason));
+                //Group creation failed
             }
         });
     }
@@ -214,30 +215,36 @@ public class WiFiP2PManagerModule extends ReactContextBaseJavaModule implements 
     }
 
     @ReactMethod
-    public void sendFile(String filePath, Callback callback) {
-        // User has picked a file. Transfer it to group owner i.e peer using FileTransferService
+    public void sendFile(String filePath, String address, Callback callback) {
+        // User has picked an image. Transfer it to group owner i.e peer using
+        // FileTransferService.
         Uri uri = Uri.fromFile(new File(filePath));
-        Log.i(TAG, "Sending: " + uri);
-        Log.i(TAG, "Intent----------- " + uri);
+        System.out.println("Sending: " + uri);
+        System.out.println("Intent----------- " + uri);
+        System.out.println("ADDRESS" + address);
         Intent serviceIntent = new Intent(getCurrentActivity(), FileTransferService.class);
         serviceIntent.setAction(FileTransferService.ACTION_SEND_FILE);
         serviceIntent.putExtra(FileTransferService.EXTRAS_FILE_PATH, uri.toString());
+        serviceIntent.putExtra(FileTransferService.RECEIVER_ADDRESS, address.toString());
         serviceIntent.putExtra(FileTransferService.EXTRAS_GROUP_OWNER_ADDRESS,
                 wifiP2pInfo.groupOwnerAddress.getHostAddress());
         serviceIntent.putExtra(FileTransferService.EXTRAS_GROUP_OWNER_PORT, 8988);
         getCurrentActivity().startService(serviceIntent);
-
+        System.out.println("EXTRAS_GROUP_OWNER_ADDRESS " + wifiP2pInfo.groupOwnerAddress.getHostAddress());
+        System.out.println("EXTRAS_GROUP_OWNER_PORT " + wifiP2pInfo.groupOwnerAddress.getHostAddress());
         callback.invoke("soon will be");
     }
 
     @ReactMethod
-    public void receiveFile(String folder, String fileName, final Callback callback) {
-        final String destination = folder + fileName;
+    public void receiveFile(final String nameOfFile,final Callback callback ) {
         manager.requestConnectionInfo(channel, new WifiP2pManager.ConnectionInfoListener() {
             @Override
             public void onConnectionInfoAvailable(WifiP2pInfo info) {
-                if (info.groupFormed && info.isGroupOwner) {
-                    new FileServerAsyncTask(getCurrentActivity(), callback, destination)
+                System.out.println("groupFormed: " + info.groupFormed);
+                System.out.println("isGroupOwner: " +  info.isGroupOwner);
+                if (info.groupFormed) {
+                    System.out.println("isInside Socket service ");
+                    new FileServerAsyncTask(getCurrentActivity(), callback,nameOfFile)
                             .execute();
                 } else if (info.groupFormed) {
                     // The other device acts as the client. In this case, we enable the
@@ -249,11 +256,12 @@ public class WiFiP2PManagerModule extends ReactContextBaseJavaModule implements 
     }
 
     @ReactMethod
-    public void sendMessage(String message, Callback callback) {
-        Log.i(TAG, "Sending message: " + message);
+    public void sendMessage(String message,String receiverAddress, Callback callback) {
+        System.out.println("Sending message: " + message);
         Intent serviceIntent = new Intent(getCurrentActivity(), MessageTransferService.class);
         serviceIntent.setAction(MessageTransferService.ACTION_SEND_MESSAGE);
         serviceIntent.putExtra(MessageTransferService.EXTRAS_DATA, message);
+        serviceIntent.putExtra(MessageTransferService.RECEIVER_ADDRESS_MESSAGE, receiverAddress);
         serviceIntent.putExtra(MessageTransferService.EXTRAS_GROUP_OWNER_ADDRESS, wifiP2pInfo.groupOwnerAddress.getHostAddress());
         serviceIntent.putExtra(MessageTransferService.EXTRAS_GROUP_OWNER_PORT, 8988);
         getCurrentActivity().startService(serviceIntent);
@@ -266,7 +274,7 @@ public class WiFiP2PManagerModule extends ReactContextBaseJavaModule implements 
         manager.requestConnectionInfo(channel, new WifiP2pManager.ConnectionInfoListener() {
             @Override
             public void onConnectionInfoAvailable(WifiP2pInfo info) {
-                if (info.groupFormed && info.isGroupOwner) {
+                if (info.groupFormed) {
                     new MessageServerAsyncTask(callback)
                             .execute();
                 } else if (info.groupFormed) {

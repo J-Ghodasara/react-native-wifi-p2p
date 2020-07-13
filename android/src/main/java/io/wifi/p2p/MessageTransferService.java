@@ -3,7 +3,6 @@ package io.wifi.p2p;
 import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -25,8 +24,7 @@ public class MessageTransferService extends IntentService {
     public static final String EXTRAS_DATA = "message";
     public static final String EXTRAS_GROUP_OWNER_ADDRESS = "go_host";
     public static final String EXTRAS_GROUP_OWNER_PORT = "go_port";
-    private static final String TAG = "RNWiFiP2P";
-
+    public static final String RECEIVER_ADDRESS_MESSAGE = "send_message_receiver";
     public MessageTransferService(String name) {
         super(name);
     }
@@ -41,25 +39,31 @@ public class MessageTransferService extends IntentService {
      */
     @Override
     protected void onHandleIntent(Intent intent) {
+
         Context context = getApplicationContext();
         if (intent.getAction().equals(ACTION_SEND_MESSAGE)) {
             String message = intent.getExtras().getString(EXTRAS_DATA);
             String host = intent.getExtras().getString(EXTRAS_GROUP_OWNER_ADDRESS);
-            int port = intent.getExtras().getInt(EXTRAS_GROUP_OWNER_PORT);
+            String receiverAddress = intent.getExtras().getString(RECEIVER_ADDRESS_MESSAGE);
             Socket socket = new Socket();
+            int port = intent.getExtras().getInt(EXTRAS_GROUP_OWNER_PORT);
 
             try {
-                Log.i(TAG, "Opening client socket - ");
+                System.out.println("Opening client socket - ");
                 socket.bind(null);
-                socket.connect((new InetSocketAddress(host, port)), SOCKET_TIMEOUT);
+                if(receiverAddress.length() > 0){
+                    socket.connect((new InetSocketAddress(receiverAddress, port)), SOCKET_TIMEOUT);
+                }else{
+                    socket.connect((new InetSocketAddress(host, port)), SOCKET_TIMEOUT);
+                }
 
-                Log.i(TAG, "Client socket connected - " + socket.isConnected());
+                System.out.println("Client socket - " + socket.isConnected());
                 OutputStream stream = socket.getOutputStream();
                 InputStream is = new ByteArrayInputStream(message.getBytes(Charset.forName(CHARSET)));
                 copyBytes(is, stream);
-                Log.i(TAG, "Client: Data written");
+                System.out.println("Client: Data written");
             } catch (IOException e) {
-                Log.e(TAG, e.getMessage());
+                System.err.println(e.getMessage());
             } finally {
                 if (socket != null) {
                     if (socket.isConnected()) {
@@ -72,6 +76,7 @@ public class MessageTransferService extends IntentService {
                     }
                 }
             }
+
         }
     }
 }
