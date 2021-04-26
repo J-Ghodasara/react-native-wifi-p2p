@@ -12,6 +12,7 @@ import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.net.wifi.p2p.WifiP2pGroup;
 import android.net.wifi.p2p.WifiP2pManager.PeerListListener;
+import android.os.Environment;
 
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Promise;
@@ -233,6 +234,15 @@ public class WiFiP2PManagerModule extends ReactContextBaseJavaModule implements 
         System.out.println("EXTRAS_GROUP_OWNER_ADDRESS " + wifiP2pInfo.groupOwnerAddress.getHostAddress());
         System.out.println("EXTRAS_GROUP_OWNER_PORT " + wifiP2pInfo.groupOwnerAddress.getHostAddress());
         callback.invoke("soon will be");
+    }
+
+    @ReactMethod
+    public void openFolder() {
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        Uri uri = Uri.parse(Environment.getExternalStorageDirectory().getPath()
+                +  File.separator + "ShareSafe" + File.separator);
+        intent.setDataAndType(uri, "*/*");
+        getCurrentActivity().startActivity(Intent.createChooser(intent, "Open folder"));
     }
 
     @ReactMethod

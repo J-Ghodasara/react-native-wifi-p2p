@@ -68,20 +68,25 @@ const stopDiscoveringPeers = () => new Promise((resolve, reject) => {
     })
 });
 
-const sendFile = (pathToFile) => new Promise((resolve, reject) => {
-    WiFiP2PManager.sendFile(pathToFile, (reasonCode) => {
+const sendFile = (pathToFile,receiverAddress) => new Promise((resolve, reject) => {
+    WiFiP2PManager.sendFile(pathToFile,receiverAddress, (reasonCode) => {
         reasonCode === undefined ? resolve() : reject(getError(reasonCode));
     });
 });
 
-const receiveFile = (folder, fileName) => new Promise((resolve, reject) => {
-    WiFiP2PManager.receiveFile(folder, fileName, (pathToFile) => {
+const openFolder  = () => new Promise((resolve, reject) => {
+    WiFiP2PManager.openFolder();
+});
+
+
+const receiveFile = (nameOfFile) => new Promise((resolve, reject) => {
+    WiFiP2PManager.receiveFile(nameOfFile,(pathToFile) => {
         resolve(pathToFile);
     });
 });
 
-const sendMessage = (message) => new Promise((resolve, reject) => {
-    WiFiP2PManager.sendMessage(message, (reasonCode) => {
+const sendMessage = (message,receiverAddress = null) => new Promise((resolve, reject) => {
+    WiFiP2PManager.sendMessage(message,receiverAddress, (reasonCode) => {
         reasonCode === undefined ? resolve() : reject(getError(reasonCode));
     });
 });
@@ -113,7 +118,7 @@ export {
     removeGroup,
     getConnectionInfo,
     getGroupPassphraseInfo,
-    
+    openFolder,
     // experimental
     sendFile,
     receiveFile,

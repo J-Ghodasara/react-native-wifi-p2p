@@ -40,7 +40,8 @@ public class FileServerAsyncTask extends AsyncTask<Void, Void, String> {
             ServerSocket serverSocket = new ServerSocket(8988);
             System.out.println("Server: Socket opened");
             Socket client = serverSocket.accept();
-
+            // Long tsLong = System.currentTimeMillis()/1000;
+            // String ts = tsLong.toString();
             final File f = new File(Environment.getExternalStorageDirectory() + "/"
                     + "ShareSafe" +"/" + nameOfFile);
             File dirs = new File(f.getParent());

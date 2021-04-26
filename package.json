@@ -1,16 +1,38 @@
 {
-  "name": "react-native-wifi-p2p",
-  "version": "2.0.2",
+  "_from": "react-native-wifi-p2p@^2.0.2",
+  "_id": "react-native-wifi-p2p@2.0.2",
+  "_inBundle": false,
+  "_integrity": "sha512-eWPoG5zZj/uqxpjmcdSgz5vQSGgV6V0U5P37r8fCBKQDjcrPSzv7m36IGEwWp2qtlVzY9Vd7t8G/MeJkWLwQQA==",
+  "_location": "/react-native-wifi-p2p",
+  "_phantomChildren": {},
+  "_requested": {
+    "type": "range",
+    "registry": true,
+    "raw": "react-native-wifi-p2p@^2.0.2",
+    "name": "react-native-wifi-p2p",
+    "escapedName": "react-native-wifi-p2p",
+    "rawSpec": "^2.0.2",
+    "saveSpec": null,
+    "fetchSpec": "^2.0.2"
+  },
+  "_requiredBy": [
+    "#USER",
+    "/"
+  ],
+  "_resolved": "https://registry.npmjs.org/react-native-wifi-p2p/-/react-native-wifi-p2p-2.0.2.tgz",
+  "_shasum": "b5d6f9dfd383284163531e599d39e9a18b1a44a0",
+  "_spec": "react-native-wifi-p2p@^2.0.2",
+  "_where": "/home/exa0121/Jay/Gitlab_ShareSafe/sharesafe",
+  "author": {
+    "name": "Kiryl Ziusko"
+  },
+  "bugs": {
+    "url": "https://github.com/kirikzyusko1996/react-native-wifi-p2p/issues"
+  },
+  "bundleDependencies": false,
+  "deprecated": false,
   "description": "Module for working with wifi direct (p2p) API module in android.",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/kirikzyusko1996/react-native-wifi-p2p.git"
-  },
   "homepage": "https://github.com/kirikzyusko1996/react-native-wifi-p2p#README.MD",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
   "keywords": [
     "react-native",
     "android",
@@ -19,6 +41,15 @@
     "wifi direct",
     "wi-fi direct"
   ],
-  "author": "Kiryl Ziusko",
-  "license": "ISC"
+  "license": "ISC",
+  "main": "index.js",
+  "name": "react-native-wifi-p2p",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kirikzyusko1996/react-native-wifi-p2p.git"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "version": "2.0.2"
 }
